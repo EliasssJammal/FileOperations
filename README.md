@@ -1,0 +1,1 @@
+File Operations reads a file and returns an error if the process doesn't work, or returns the file contents if the process works.
