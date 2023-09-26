@@ -6,3 +6,5 @@ File Operations has 3 operations it can execute:
 or replace the file content with the new content if the file does exist.
 
 3. Deletes a specified file or returns an error if the file does not exist.
+
+Server has a route to display a list of all workouts, a POST route to handle the creation of a new workout and adds it to the workouts array, a PUT route to handle an update of a workout based on its ID, and a DELETE route to handle the deletion of a workout based on its ID.
