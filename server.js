@@ -8,87 +8,85 @@ app.use(express.json());
 app.set('view engine', 'ejs')
 app.use(methodOverride('_method'))
 
-app.use((req,res,next) =>{
-console.log(`${req.method} request for ${req.url}`);
-next()
+app.use((req, res, next) => {
+    console.log(`${req.method} request for ${req.url}`);
+    next()
 })
 
-
-const workouts = [
+let workouts = [
     { id: 1, name: 'Pushups' },
     { id: 2, name: 'Situps' },
     { id: 3, name: 'Jogging' },
 ]
 
-app.get('/', (req, res) =>{
-    res.send(`<button ><a href="/api/workouts""> workouts </a> </button> <button ><a href="/api/workouts/add""> add workouts </a> </button> `)
+app.get('/', (req, res) => {
+    res.send(`<button ><a href="/v1/api/workouts">workouts</a></button> <button ><a href="/v1/api/workouts/add">add workouts</a></button>`)
 })
 
-app.get('/api/workouts', (req,res) =>{
-    res.render("workouts.ejs", {workouts})
+app.get('/v1/api/workouts', (req, res) => {
+    let filteredWorkouts = [...workouts];
+
+    // Filtering
+    if (req.query.name) {
+        filteredWorkouts = filteredWorkouts.filter(workout => workout.name.includes(req.query.name));
+    }
+
+    // Sorting
+    if (req.query.sort === 'name') {
+        filteredWorkouts.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    res.render("workouts.ejs", { workouts: filteredWorkouts });
 })
 
-app.get('/api/workouts/add', (req,res) =>{
+app.get('/v1/api/workouts/add', (req, res) => {
     res.render('workoutForm.ejs');
 })
 
-app.get('/api/workouts/add/:id', (req,res) =>{
+app.get('/v1/api/workouts/add/:id', (req, res) => {
     res.render('updateWorkout.ejs');
 })
 
-app.post('/api/workouts', (req, res)=>{
-
-    console.log(req.body.name);
-
-    const newWorkout ={
-    id:workouts.length + 1,
-    name: req.body.name
+app.post('/v1/api/workouts', (req, res) => {
+    const newWorkout = {
+        id: workouts.length + 1,
+        name: req.body.name
     };
-
     workouts.push(newWorkout);
-    res.redirect('/api/workouts');
-
+    res.redirect('/v1/api/workouts');
 })
 
-
-// Define a PUT route handler for updating a workout.
-app.put('/api/workouts/update/:id', (req, res) => {
-    console.log("fired put");
+app.put('/v1/api/workouts/update/:id', (req, res) => {
     const workoutId = parseInt(req.params.id);
     const updatedName = req.body.name;
 
     const workout = workouts.find(w => w.id === workoutId);
-
     if (workout) {
-      workout.name = updatedName;
-      res.status(200).send(`Workout with ID ${workoutId} updated.`);
+        workout.name = updatedName;
+        res.status(200).send(`Workout with ID ${workoutId} updated.`);
     } else {
-      res.status(404).send(`Workout with ID ${workoutId} not found.`);
+        res.status(404).send(`Workout with ID ${workoutId} not found.`);
     }
-  });
+});
 
-
-// Define a DELETE route handler for deleting a workout.
-app.delete('/api/workouts/delete/:id', (req, res) => {
+app.delete('/v1/api/workouts/delete/:id', (req, res) => {
     const workoutId = parseInt(req.params.id);
-
     const index = workouts.findIndex(w => w.id === workoutId);
 
     if (index !== -1) {
-      workouts.splice(index, 1);
-    //   res.status(200).send(`Workout with ID ${workoutId} deleted.`);
-      res.redirect('/api/workouts')
+        workouts.splice(index, 1);
+        res.redirect('/v1/api/workouts')
     } else {
-      res.status(404).send(`Workout with ID ${workoutId} not found.`);
+        res.status(404).send(`Workout with ID ${workoutId} not found.`);
     }
-  });
+});
 
-app.listen(port, ()=>{
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something went wrong!');
+});
+
+app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
 })
-
-
-// Start the server on port 3000
-server.listen(3000, () => {
-  console.log('Server running on <http://localhost:3000/>');
-});
