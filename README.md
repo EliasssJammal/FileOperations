@@ -19,3 +19,18 @@ The event loop works by:
 2. Execute the callbacks
 3. Re-enter the event loop
 
+The updated code includes a React component called `StepTracker` that interacts with a server built using Express and MongoDB. Here's an overview of what the code does:
+
+1:
+   - Establishes a connection to a MongoDB database using Mongoose.
+   - Defines a schema and model for a `Step` collection in the database.
+
+2:
+   - Sets up an Express server with endpoints for fetching and adding steps to the MongoDB database.
+   - The server runs on `http://localhost:3000/`.
+
+3:
+   - Integrates MongoDB operations into a React application using Axios for HTTP requests.
+   - Provides a `StepTracker` component that fetches and displays steps from the server.
+   - Allows users to add new steps through a form.
+
